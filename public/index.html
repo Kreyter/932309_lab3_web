@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <h1>To-Do List</h1>
+
+  <!-- Форма для добавления задач -->
+  <form id="todo-form" action="/add" method="POST">
+    <input type="text" id="task" name="task" placeholder="Введите задачу" required>
+    <button type="submit">Добавить</button>
+  </form>
+
+  <!-- Список задач -->
+  <ul id="task-list">
+    <!-- Задачи будут отображаться здесь -->
+  </ul>
+
+  <script>
+    // Получаем задачи с сервера и отображаем
+    async function loadTasks() {
+      const response = await fetch('/tasks');
+      const tasks = await response.json();
+
+      const taskList = document.getElementById('task-list');
+      taskList.innerHTML = ''; // Очистка списка
+
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.textContent = task;
+
+        // Кнопка удаления
+        const button = document.createElement('button');
+        button.textContent = 'Удалить';
+        button.onclick = () => deleteTask(index);
+
+        li.appendChild(button);
+        taskList.appendChild(li);
+      });
+    }
+
+    // Удаление задачи
+    async function deleteTask(index) {
+      await fetch(`/delete/${index}`, { method: 'POST' });
+      loadTasks(); // Перезагрузка списка
+    }
+
+    // Загрузка задач при открытии страницы
+    loadTasks();
+  </script>
+</body>
+</html>
